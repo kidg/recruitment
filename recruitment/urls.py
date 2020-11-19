@@ -19,6 +19,7 @@ from django.utils.translation import gettext as _
 
 urlpatterns = [
     path('admin/', admin.site.urls),
+    path('grappelli/', include('grappelli.urls')),
 ]
 
 admin.site.site_header = _('招聘系统')
