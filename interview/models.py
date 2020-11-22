@@ -28,9 +28,11 @@ class Candidate(models.Model):
     paper_score = models.DecimalField(decimal_places=1, null=True, max_digits=3, blank=True, verbose_name=u'笔试成绩')
 
     #第一轮面试记录
+    # first_interviewer_user = models.CharField(max_length=135, verbose_name=u'一面面试官')
     first_score =models.DecimalField(decimal_places=1, null=True, max_digits=2, blank=True, verbose_name=u'初试分')
 
     #第二轮面试记录
+    # second_interviewer_user = models.CharField(max_length=135, verbose_name=u'二面面试官')
     second_score =models.DecimalField(decimal_places=1, null=True, max_digits=2, blank=True, verbose_name=u'复试分')
 
     #HR终面

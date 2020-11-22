@@ -4,6 +4,7 @@ from django.http import HttpResponse
 import csv
 from datetime import datetime
 import logging
+from interview.dingtalk import send
 
 # Register your models here.
 logger = logging.getLogger(__name__)
@@ -32,13 +33,22 @@ def export_model_as_csv(modeladmin, request, queryset):
     logger.info("%s extend %s recores" %(request.user, len(queryset)))
     return response
 
+#通知一面面试官
+def notify_interviewer(modeladmin, request, queryset):
+    candidates = ""
+    interviewers = ""
+    for obj in queryset:
+        candidates = obj.username + "，" + candidates
+    send("通知：候选人 {} 进入面试".format(candidates))
+
 export_model_as_csv.short_description = u'导出为CSV文件'
+notify_interviewer.short_description = u'通知一面面试官'
 
 class CandidateAdmin(admin.ModelAdmin):
     #隐藏字段
-    exclude = ()
+    # exclude = ()
     #自定义导出到csv文件
-    actions = [export_model_as_csv,]
+    actions = [export_model_as_csv, notify_interviewer,]
     #展示字段
     # list_display = ()
 
