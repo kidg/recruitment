@@ -44,7 +44,12 @@ INSTALLED_APPS = [
     'registration',
 ]
 
+ACCOUNT_ACTIVATION_DAYS = 7
+INCLUDE_REGISTER_URL = "/accounts/register/"
+SIMPLE_BACKEND_REDIRECT_URL = "/accounts/login/"
+
 MIDDLEWARE = [
+    'interview.performance.PerformanceAndExceptionLoggerMiddleware',
     'django.middleware.security.SecurityMiddleware',
     'django.contrib.sessions.middleware.SessionMiddleware',
     'django.middleware.common.CommonMiddleware',
@@ -142,7 +147,7 @@ STATIC_URL = '/static/'
 
 
 #日志
-"""
+
 LOGGING = {
     "version" : 1,
     "disable_existing_loggers" :False,
@@ -163,6 +168,12 @@ LOGGING = {
             "formatter":"simple",
             "filename":os.path.join(os.path.dirname(BASE_DIR), 'recruitment.admin.log')
         },
+        "performance":{
+            # "level":"INFO",
+            "class":"logging.FileHandler",
+            "formatter":"simple",
+            "filename":os.path.join(os.path.dirname(BASE_DIR), 'recruitment.performance.log')
+        },
     },
     # "root":{
     #     "handlers":["console", "file"],
@@ -181,6 +192,23 @@ LOGGING = {
             'level': 'INFO',
             'propagate': True
         },
+        'interview.performance': {
+            'handlers': [ 'console', 'performance'],
+            'level': 'INFO',
+            'propagate': False
+        },
     },
 }
-"""
+
+import sentry_sdk
+from sentry_sdk.integrations.django import DjangoIntegration
+
+sentry_sdk.init(
+    dsn="https://603d38e36e0e4cedb4ddaab2740a7a8f@o432219.ingest.sentry.io/5559703",
+    integrations=[DjangoIntegration()],
+    traces_sample_rate=1.0,
+
+    # If you wish to associate users to errors (assuming you are using
+    # django.contrib.auth) you may enable sending PII data.
+    send_default_pii=True
+)
