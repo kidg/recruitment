@@ -42,21 +42,32 @@ INSTALLED_APPS = [
     'interview',
     'dingtalkchatbot',
     'registration',
+    'rest_framework',
 ]
+
+REST_FRAMEWORK = {
+    # Use Django's standard `django.contrib.auth` permissions,
+    # or allow read-only access for unauthenticated users.
+    'DEFAULT_PERMISSION_CLASSES': [
+        'rest_framework.permissions.DjangoModelPermissionsOrAnonReadOnly'
+    ]
+}
 
 ACCOUNT_ACTIVATION_DAYS = 7
 INCLUDE_REGISTER_URL = "/accounts/register/"
 SIMPLE_BACKEND_REDIRECT_URL = "/accounts/login/"
 
 MIDDLEWARE = [
+    'django.middleware.common.CommonMiddleware',
     'interview.performance.PerformanceAndExceptionLoggerMiddleware',
     'django.middleware.security.SecurityMiddleware',
     'django.contrib.sessions.middleware.SessionMiddleware',
-    'django.middleware.common.CommonMiddleware',
+    'django.middleware.cache.UpdateCacheMiddleware',
     'django.middleware.csrf.CsrfViewMiddleware',
     'django.contrib.auth.middleware.AuthenticationMiddleware',
     'django.contrib.messages.middleware.MessageMiddleware',
     'django.middleware.clickjacking.XFrameOptionsMiddleware',
+    'django.middleware.cache.FetchFromCacheMiddleware',
 ]
 
 ROOT_URLCONF = 'recruitment.urls'
@@ -80,7 +91,6 @@ TEMPLATES = [
 
 WSGI_APPLICATION = 'recruitment.wsgi.application'
 
-
 # Database
 # https://docs.djangoproject.com/en/3.1/ref/settings/#databases
 
@@ -102,7 +112,18 @@ DATABASES = {
     }
 }
 
+CACHES = {
+    "default": {
+        "BACKEND": "django_redis.cache.RedisCache",
+        "LOCATION": "redis://127.0.0.1:6379",
+        "TIMEOUT":300,
+        "OPTIONS": {
+            "CLIENT_CLASS": "django_redis.client.DefaultClient",
+        }
+    }
+}
 
+CACHE_MIDDLEWARE_SECONDS = 600
 # Password validation
 # https://docs.djangoproject.com/en/3.1/ref/settings/#auth-password-validators
 
@@ -121,7 +142,15 @@ AUTH_PASSWORD_VALIDATORS = [
     },
 ]
 
-
+# session 设置
+# SESSION_COOKIE_NAME = "sessionid"       # Session的cookie保存在浏览器上时的key，即：sessionid＝随机字符串（默认）
+# SESSION_COOKIE_PATH = "/"               # Session的cookie保存的路径（默认）
+# SESSION_COOKIE_DOMAIN = None             # Session的cookie保存的域名（默认）
+# SESSION_COOKIE_SECURE = False            # 是否Https传输cookie（默认）
+# SESSION_COOKIE_HTTPONLY = True           # 是否Session的cookie只支持http传输（默认）
+# SESSION_COOKIE_AGE = 3600 * 24           # Session的cookie失效日期（2周）（数字为秒数）（默认）
+# SESSION_EXPIRE_AT_BROWSER_CLOSE = True  # 是否关闭浏览器使得Session过期（默认）
+# SESSION_SAVE_EVERY_REQUEST = True       # 是否每次请求都保存Session，默认修改之后才保存（默认）
 # Internationalization
 # https://docs.djangoproject.com/en/3.1/topics/i18n/
 
@@ -137,7 +166,7 @@ USE_I18N = True
 
 USE_L10N = True
 
-USE_TZ = True
+USE_TZ = False
 
 
 # Static files (CSS, JavaScript, Images)
@@ -200,15 +229,5 @@ LOGGING = {
     },
 }
 
-import sentry_sdk
-from sentry_sdk.integrations.django import DjangoIntegration
 
-sentry_sdk.init(
-    dsn="https://603d38e36e0e4cedb4ddaab2740a7a8f@o432219.ingest.sentry.io/5559703",
-    integrations=[DjangoIntegration()],
-    traces_sample_rate=1.0,
 
-    # If you wish to associate users to errors (assuming you are using
-    # django.contrib.auth) you may enable sending PII data.
-    send_default_pii=True
-)
