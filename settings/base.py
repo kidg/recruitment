@@ -43,6 +43,7 @@ INSTALLED_APPS = [
     'dingtalkchatbot',
     'registration',
     'rest_framework',
+    'django_celery_beat',
 ]
 
 REST_FRAMEWORK = {
@@ -58,11 +59,11 @@ INCLUDE_REGISTER_URL = "/accounts/register/"
 SIMPLE_BACKEND_REDIRECT_URL = "/accounts/login/"
 
 MIDDLEWARE = [
-    'django.middleware.common.CommonMiddleware',
+ 	'django.middleware.cache.UpdateCacheMiddleware',
     'interview.performance.PerformanceAndExceptionLoggerMiddleware',
     'django.middleware.security.SecurityMiddleware',
     'django.contrib.sessions.middleware.SessionMiddleware',
-    'django.middleware.cache.UpdateCacheMiddleware',
+    'django.middleware.common.CommonMiddleware',   
     'django.middleware.csrf.CsrfViewMiddleware',
     'django.contrib.auth.middleware.AuthenticationMiddleware',
     'django.contrib.messages.middleware.MessageMiddleware',
@@ -115,7 +116,7 @@ DATABASES = {
 CACHES = {
     "default": {
         "BACKEND": "django_redis.cache.RedisCache",
-        "LOCATION": "redis://127.0.0.1:6379",
+        "LOCATION": "redis://127.0.0.1:6379/1",
         "TIMEOUT":300,
         "OPTIONS": {
             "CLIENT_CLASS": "django_redis.client.DefaultClient",
@@ -166,14 +167,17 @@ USE_I18N = True
 
 USE_L10N = True
 
-USE_TZ = False
+USE_TZ = True
 
 
 # Static files (CSS, JavaScript, Images)
 # https://docs.djangoproject.com/en/3.1/howto/static-files/
 
 STATIC_URL = '/static/'
+STATIC_ROOT = 'static'
 
+MEDIA_ROOT = os.path.join(BASE_DIR, 'media')
+MEDIA_URL = '/media/'
 
 #日志
 

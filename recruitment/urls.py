@@ -47,4 +47,11 @@ urlpatterns = [
     path('api-auth/', include('rest_framework.urls'))
 ]
 
+from django.conf.urls.static import static
+from django.conf import settings
+
+urlpatterns += static(settings.MEIDA_URL,
+                      document_root = settings.MEDIA_ROOT
+                      )
+
 admin.site.site_header = _('招聘系统')

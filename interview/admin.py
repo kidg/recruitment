@@ -5,6 +5,7 @@ import csv
 from datetime import datetime
 import logging
 from interview.dingtalk import send
+from interview.tasks import send_dingtalk_message
 
 # Register your models here.
 logger = logging.getLogger(__name__)
@@ -39,7 +40,7 @@ def notify_interviewer(modeladmin, request, queryset):
     interviewers = ""
     for obj in queryset:
         candidates = obj.username + "，" + candidates
-    send("通知：候选人 {} 进入面试".format(candidates))
+    send_dingtalk_message.delay("通知：候选人 {} 进入面试".format(candidates))
 
 export_model_as_csv.short_description = u'导出为CSV文件'
 notify_interviewer.short_description = u'通知一面面试官'
