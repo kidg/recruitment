@@ -24,26 +24,29 @@ BASE_DIR = Path(__file__).resolve().parent.parent
 SECRET_KEY = '1ra_x&w^q0erfsnd&3r&p_e-ygaptns8zj^a=r8-bj-cop@*yt'
 
 # SECURITY WARNING: don't run with debug turned on in production!   sdas s
-DEBUG = True
 
 ALLOWED_HOSTS = []
 
 
 # Application definition
+#     'grappelli',  #放在最前面
+#     'debug_toolbar',
 
 INSTALLED_APPS = [
-    'grappelli',  #放在最前面
+    'simpleui',
     'django.contrib.admin',
     'django.contrib.auth',
     'django.contrib.contenttypes',
     'django.contrib.sessions',
     'django.contrib.messages',
     'django.contrib.staticfiles',
-    'interview',
+    'interview.apps.CandidateConfig',
     'dingtalkchatbot',
     'registration',
     'rest_framework',
     'django_celery_beat',
+    'running',
+
 ]
 
 REST_FRAMEWORK = {
@@ -60,7 +63,7 @@ SIMPLE_BACKEND_REDIRECT_URL = "/accounts/login/"
 
 MIDDLEWARE = [
  	'django.middleware.cache.UpdateCacheMiddleware',
-    'interview.performance.PerformanceAndExceptionLoggerMiddleware',
+    # 'interview.performance.PerformanceAndExceptionLoggerMiddleware',
     'django.middleware.security.SecurityMiddleware',
     'django.contrib.sessions.middleware.SessionMiddleware',
     'django.middleware.common.CommonMiddleware',   
@@ -68,8 +71,15 @@ MIDDLEWARE = [
     'django.contrib.auth.middleware.AuthenticationMiddleware',
     'django.contrib.messages.middleware.MessageMiddleware',
     'django.middleware.clickjacking.XFrameOptionsMiddleware',
+    # 'debug_toolbar.middleware.DebugToolbarMiddleware',
     'django.middleware.cache.FetchFromCacheMiddleware',
 ]
+
+INTERNAL_IPS = ['127.0.0.1']
+
+DEBUG_TOOLBAR_CONFIG = {
+    'JQUERY_URL': 'https://cdn.bootcss.com/jquery/2.2.4/jquery.min.js',
+}
 
 ROOT_URLCONF = 'recruitment.urls'
 
@@ -110,8 +120,19 @@ DATABASES = {
         'PASSWORD': 'P@ssword',
         'HOST': '127.0.0.1',
 	    'PORT': 3307,
+    },
+    'slave': {
+        'ENGINE': 'django.db.backends.mysql',
+        'NAME': 'django_mysql',
+        'USER': 'root',
+        'PASSWORD': 'P@ssword',
+        'HOST': '127.0.0.1',
+	    'PORT': 3308,
     }
 }
+
+#这里配置读写库
+# DATABASE_ROUTERS = ['settings.router.DatabaseRouter']
 
 CACHES = {
     "default": {
@@ -188,10 +209,14 @@ LOGGING = {
         "simple":{
             'format':'%(asctime)s %(name)-12s %(lineno)d'
         },
+        'standard': {
+            'format': '[%(asctime)s] [%(filename)s:%(lineno)d] [%(module)s:%(funcName)s] '
+                      '[%(levelname)s]- %(message)s'},
     },
     "filters":{},   #过滤
     "handlers" :{   #定义具体处理日志的方式
         "console":{
+            "level":"DEBUG",
             "class":"logging.StreamHandler",
             "formatter":"simple",
         },
@@ -202,10 +227,16 @@ LOGGING = {
             "filename":os.path.join(os.path.dirname(BASE_DIR), 'recruitment.admin.log')
         },
         "performance":{
-            # "level":"INFO",
+            "level":"INFO",
             "class":"logging.FileHandler",
-            "formatter":"simple",
+            "formatter":"standard",
             "filename":os.path.join(os.path.dirname(BASE_DIR), 'recruitment.performance.log')
+        },
+        "signal_processor":{
+            "level":"INFO",
+            "class":"logging.FileHandler",
+            "formatter":"standard",
+            "filename":os.path.join(os.path.dirname(BASE_DIR), 'recruitment.signal_processor.log')
         },
     },
     # "root":{
@@ -214,22 +245,32 @@ LOGGING = {
     # },
     "loggers":{  #配置用哪几种handlers来处理日志
         # 类型 为 django 处理所有类型的日志， 默认调用
-        'django': {
-            'handlers': ['file', 'console'],
-            'level': 'INFO',
-            'propagate': False
-        },
-        # log 调用时需要当作参数传入
-        'log': {
-            'handlers': [ 'console', 'file'],
-            'level': 'INFO',
-            'propagate': True
-        },
+        # 'django': {
+        #     'handlers': ['file', 'console'],
+        #     'level': 'INFO',
+        #     'propagate': False
+        # },
+        # # log 调用时需要当作参数传入
+        # 'log': {
+        #     'handlers': [ 'console', 'file'],
+        #     'level': 'INFO',
+        #     'propagate': True
+        # },
         'interview.performance': {
-            'handlers': [ 'console', 'performance'],
+            'handlers': [ 'performance'],
             'level': 'INFO',
             'propagate': False
         },
+        'settings.router': {
+            'handlers': [ 'performance'],
+            'level': 'INFO',
+            'propagate': False
+        },
+        'interview.signal_processor': {
+            'handlers': [ 'signal_processor'],
+            'level': 'INFO',
+            'propagate': False
+        }
     },
 }
 

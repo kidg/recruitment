@@ -50,8 +50,14 @@ urlpatterns = [
 from django.conf.urls.static import static
 from django.conf import settings
 
-urlpatterns += static(settings.MEIDA_URL,
+urlpatterns += static(settings.MEDIA_URL,
                       document_root = settings.MEDIA_ROOT
                       )
 
 admin.site.site_header = _('招聘系统')
+
+if settings.DEBUG:
+    import debug_toolbar
+    urlpatterns = [
+        url(r'^__debug__/', include(debug_toolbar.urls)),
+    ] + urlpatterns
